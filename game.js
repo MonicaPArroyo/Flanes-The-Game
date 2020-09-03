@@ -22,8 +22,28 @@ function create(){
     platform = this.physics.add.staticGroup();
     platform.create(675, 575, 'ground')
 
-    createAnimations();
-    
+    //createAnimations(); //Necesito revisar el uso de clases
+    //player's animation
+    this.anims.create({
+        key: 'run',
+        frames: this.anims.generateFrameNumbers('flan', { start: 4, end: 9 }),
+        frameRate: 8,
+        repeat: -1
+    });
+  
+    this.anims.create({
+        key: 'still',
+        frames: this.anims.generateFrameNumbers('flan', { start: 0, end: 3 }),
+        frameRate: 8,
+        repeat: -1
+    });
+  
+    this.anims.create({
+        key: 'jump',
+        frames: this.anims.generateFrameNumbers('flan', { start: 2, end: 3 }),
+        frameRate: 8,
+        repeat: -1
+    })
 
     cursors = this.input.keyboard.createCursorKeys();
 
