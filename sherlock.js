@@ -4,18 +4,24 @@ class sherlock extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet('flan', 'assets/flan.png', { frameWidth: 88, frameHeight: 66 });
-    this.load.spritesheet('skull', 'assets/skull.png', {frameWidth: 110, frameHeight: 178});
-    this.load.spritesheet('scarf', 'assets/scarf.png', {frameWidth: 110, frameHeight: 178});
-    this.load.spritesheet('smile', 'assets/smile.png', {frameWidth: 110, frameHeight: 178});
-    this.load.spritesheet('mobile', 'assets/mobile.png', {frameWidth: 110, frameHeight: 178});
-    this.load.spritesheet('violin', 'assets/violin.png', {frameWidth: 110, frameHeight: 178});
-    this.load.spritesheet('hedgehog', 'assets/hedgehog.png', {frameWidth: 106, frameHeight: 101});
-    this.load.image('apple', 'assets/apple.png')
-    this.load.image('ground', 'assets/platform.png');
+    this.load.spritesheet('flan', 'assets/sprites/flan.png', { frameWidth: 88, frameHeight: 66 });
+    this.load.spritesheet('skull', 'assets/sprites/skull.png', {frameWidth: 110, frameHeight: 178});
+    this.load.spritesheet('scarf', 'assets/sprites/scarf.png', {frameWidth: 110, frameHeight: 178});
+    this.load.spritesheet('smile', 'assets/sprites/smile.png', {frameWidth: 110, frameHeight: 178});
+    this.load.spritesheet('mobile', 'assets/sprites/mobile.png', {frameWidth: 110, frameHeight: 178});
+    this.load.spritesheet('violin', 'assets/sprites/violin.png', {frameWidth: 110, frameHeight: 178});
+    this.load.spritesheet('hedgehog', 'assets/sprites/hedgehog.png', {frameWidth: 106, frameHeight: 101});
+    this.load.image('apple', 'assets/sprites/apple.png')
+    this.load.image('ground', 'assets/sprites/platform.png');
+
+    //background
+    this.load.image('bg1', 'assets/backgrounds/clouds.png');
+    this.load.image('bg2', 'assets/backgrounds/london.png');
   }
 
   create() {
+    gameState.active = true
+    gameState.bgColor = this.add.rectangle(0, 0, config.width, config.height, 0x00aabb).setOrigin(0, 0);
     gameState.player = this.physics.add.sprite(100, 450, 'flan')
     gameState.player.setBounce(0.2);
     gameState.player.setCollideWorldBounds(true);
