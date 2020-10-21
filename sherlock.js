@@ -15,13 +15,14 @@ class sherlock extends Phaser.Scene {
     this.load.image('ground', 'assets/sprites/platform.png');
 
     //background
-    this.load.image('bg1', 'assets/backgrounds/clouds.png');
-    this.load.image('bg2', 'assets/backgrounds/london.png');
+    this.load.image('bg1', 'assets/backgrounds/london.png');
+    this.load.image('bg2', 'assets/backgrounds/clouds.png');
+    this.load.image('bg3', 'assets/backgrounds/sky.png');
   }
 
   create() {
     gameState.active = true
-    gameState.bgColor = this.add.rectangle(0, 0, config.width, config.height, 0x00aabb).setOrigin(0, 0);
+    this.createParallaxBackgrounds();
     gameState.player = this.physics.add.sprite(100, 450, 'flan')
     gameState.player.setBounce(0.2);
     gameState.player.setCollideWorldBounds(true);
@@ -30,6 +31,12 @@ class sherlock extends Phaser.Scene {
     platform.create(675, 575, 'ground')
 
     this.createAnimations(); 
+
+    this.cameras.main.setBounds(0, 0, gameState.bg3.width, gameState.bg3.height);
+    this.physics.world.setBounds(0, 0, gameState.width, gameState.bg3.height + gameState.player.height);
+
+    this.cameras.main.startFollow(gameState.player, true, 0.5, 0.5)
+    gameState.player.setCollideWorldBounds(true);
 
     gameState.cursors = this.input.keyboard.createCursorKeys();
 
@@ -110,6 +117,30 @@ class sherlock extends Phaser.Scene {
         frameRate: 8,
         repeat: 0
     })
+  }
+  
+  createParallaxBackgrounds() {
+    gameState.bg3 = this.add.image(0, 0, 'bg3');
+    gameState.bg2 = this.add.image(0, 0, 'bg2');
+    gameState.bg1 = this.add.image(0, 0, 'bg1');
+    
+    
+
+    gameState.bg1.setOrigin(0, 0);
+    gameState.bg2.setOrigin(0, 0);
+    gameState.bg3.setOrigin(0, 0);
+
+    const game_width = parseFloat(gameState.bg3.getBounds().width)
+    gameState.width = game_width;
+    const window_width = config.width
+
+    const bg1_width = gameState.bg1.getBounds().width
+    const bg2_width = gameState.bg2.getBounds().width
+    const bg3_width = gameState.bg3.getBounds().width
+
+    gameState.bg3 .setScrollFactor(0);
+    gameState.bg1.setScrollFactor((bg1_width - window_width) / (game_width - window_width));
+    gameState.bg2.setScrollFactor((bg2_width - window_width) / (game_width - window_width));
   }
 
   update(){
