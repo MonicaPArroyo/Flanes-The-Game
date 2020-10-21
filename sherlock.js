@@ -12,7 +12,7 @@ class sherlock extends Phaser.Scene {
     this.load.spritesheet('violin', 'assets/sprites/violin.png', {frameWidth: 110, frameHeight: 178});
     this.load.spritesheet('hedgehog', 'assets/sprites/hedgehog.png', {frameWidth: 106, frameHeight: 101});
     this.load.image('apple', 'assets/sprites/apple.png')
-    this.load.image('ground', 'assets/sprites/platform.png');
+    this.load.image('ground', 'assets/principal_platform.png');
 
     //background
     this.load.image('bg1', 'assets/backgrounds/london.png');
@@ -28,7 +28,7 @@ class sherlock extends Phaser.Scene {
     gameState.player.setCollideWorldBounds(true);
 
     const platform = this.physics.add.staticGroup();
-    platform.create(675, 575, 'ground')
+    platform.create(1000, 600, 'ground')
 
     this.createAnimations(); 
 
