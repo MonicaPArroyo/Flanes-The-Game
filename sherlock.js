@@ -1,6 +1,7 @@
 class sherlock extends Phaser.Scene {
   constructor(){
     super({key: 'sherlock'})
+    this.heights = [4, 7, 5, null, 5, 4, null, 4, 4];
   }
 
   preload() {
@@ -23,15 +24,20 @@ class sherlock extends Phaser.Scene {
 
   create() {
     gameState.active = true
+
     this.createParallaxBackgrounds();
+
     gameState.player = this.physics.add.sprite(100, 450, 'flan')
     gameState.player.setBounce(0.2);
     gameState.player.setCollideWorldBounds(true);
 
-    const p_platform = this.physics.add.staticGroup();
-    p_platform.create(1000, 587, 'p_platform')
+    gameState.p_platform = this.physics.add.staticGroup();
+    gameState.p_platform.create(1000, 587, 'p_platform')
+
+    gameState.platforms = this.physics.add.staticGroup();
 
     this.createAnimations(); 
+    this.levelSetup();
 
     this.cameras.main.setBounds(0, 0, gameState.bg3.width, gameState.bg3.height);
     this.physics.world.setBounds(0, 0, gameState.width, gameState.bg3.height + gameState.player.height);
@@ -41,7 +47,32 @@ class sherlock extends Phaser.Scene {
 
     gameState.cursors = this.input.keyboard.createCursorKeys();
 
-    this.physics.add.collider(gameState.player, p_platform);
+    this.physics.add.collider(gameState.player, gameState.p_platform);
+    this.physics.add.collider(gameState.player, gameState.platforms);
+  }
+
+  createParallaxBackgrounds() {
+    gameState.bg3 = this.add.image(0, 0, 'bg3');
+    gameState.bg2 = this.add.image(0, 0, 'bg2');
+    gameState.bg1 = this.add.image(0, 0, 'bg1');
+    
+    
+
+    gameState.bg1.setOrigin(0, 0);
+    gameState.bg2.setOrigin(0, 0);
+    gameState.bg3.setOrigin(0, 0);
+
+    const game_width = parseFloat(gameState.bg3.getBounds().width)
+    gameState.width = game_width;
+    const window_width = config.width
+
+    const bg1_width = gameState.bg1.getBounds().width
+    const bg2_width = gameState.bg2.getBounds().width
+    const bg3_width = gameState.bg3.getBounds().width
+
+    gameState.bg3 .setScrollFactor(0);
+    gameState.bg1.setScrollFactor((bg1_width - window_width) / (game_width - window_width));
+    gameState.bg2.setScrollFactor((bg2_width - window_width) / (game_width - window_width));
   }
 
   createAnimations() {
@@ -119,41 +150,31 @@ class sherlock extends Phaser.Scene {
         repeat: 0
     })
   }
-  
-  createParallaxBackgrounds() {
-    gameState.bg3 = this.add.image(0, 0, 'bg3');
-    gameState.bg2 = this.add.image(0, 0, 'bg2');
-    gameState.bg1 = this.add.image(0, 0, 'bg1');
-    
-    
 
-    gameState.bg1.setOrigin(0, 0);
-    gameState.bg2.setOrigin(0, 0);
-    gameState.bg3.setOrigin(0, 0);
+  levelSetup() {
+    for (const [xIndex, yIndex] of this.heights.entries()) {
+      this.createPlatform(xIndex, yIndex);
+    } 
+  }
 
-    const game_width = parseFloat(gameState.bg3.getBounds().width)
-    gameState.width = game_width;
-    const window_width = config.width
-
-    const bg1_width = gameState.bg1.getBounds().width
-    const bg2_width = gameState.bg2.getBounds().width
-    const bg3_width = gameState.bg3.getBounds().width
-
-    gameState.bg3 .setScrollFactor(0);
-    gameState.bg1.setScrollFactor((bg1_width - window_width) / (game_width - window_width));
-    gameState.bg2.setScrollFactor((bg2_width - window_width) / (game_width - window_width));
+  createPlatform(xIndex, yIndex) {
+    // Creates a platform evenly spaced along the two indices.
+    // If either is not a number it won't make a platform
+      if (typeof yIndex === 'number' && typeof xIndex === 'number') {
+        gameState.platforms.create((220 * xIndex),  yIndex * 70, 'platform').setOrigin(0, 0.5).refreshBody();
+      }
   }
 
   update(){
     if (gameState.cursors.left.isDown)
     {
-        gameState.player.flipX = true;
+        //gameState.player.flipX = true;
         gameState.player.setVelocityX(-160);
         gameState.player.anims.play('run', true);
     }
     else if (gameState.cursors.right.isDown)
     {
-        gameState.player.flipX = false;
+        //gameState.player.flipX = false;
         gameState.player.setVelocityX(160);
         gameState.player.anims.play('run', true);
     }
@@ -166,7 +187,7 @@ class sherlock extends Phaser.Scene {
     if (gameState.cursors.up.isDown && gameState.player.body.touching.down)
     {
         gameState.player.anims.play('jump', true);
-        gameState.player.setVelocityY(-330);
+        gameState.player.setVelocityY(-500);
     }
 }
 

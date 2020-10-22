@@ -12,7 +12,7 @@ const config = {
             enableBody: true,
         }
     },
-    scene: [sherlock]
+    scene: [sherlock, doctorWho]
 };
 
 const game = new Phaser.Game(config);
