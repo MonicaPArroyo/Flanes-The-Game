@@ -12,7 +12,8 @@ class sherlock extends Phaser.Scene {
     this.load.spritesheet('violin', 'assets/sprites/violin.png', {frameWidth: 110, frameHeight: 178});
     this.load.spritesheet('hedgehog', 'assets/sprites/hedgehog.png', {frameWidth: 106, frameHeight: 101});
     this.load.image('apple', 'assets/sprites/apple.png')
-    this.load.image('ground', 'assets/principal_platform.png');
+    this.load.image('p_platform', 'assets/principal_platform.png');
+    this.load.image('platform', 'assets/platform.png');
 
     //background
     this.load.image('bg1', 'assets/backgrounds/london.png');
@@ -27,8 +28,8 @@ class sherlock extends Phaser.Scene {
     gameState.player.setBounce(0.2);
     gameState.player.setCollideWorldBounds(true);
 
-    const platform = this.physics.add.staticGroup();
-    platform.create(1000, 600, 'ground')
+    const p_platform = this.physics.add.staticGroup();
+    p_platform.create(1000, 587, 'p_platform')
 
     this.createAnimations(); 
 
@@ -40,7 +41,7 @@ class sherlock extends Phaser.Scene {
 
     gameState.cursors = this.input.keyboard.createCursorKeys();
 
-    this.physics.add.collider(gameState.player, platform);
+    this.physics.add.collider(gameState.player, p_platform);
   }
 
   createAnimations() {
