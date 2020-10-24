@@ -26,7 +26,7 @@ class sherlock extends Phaser.Scene {
 
   create() {
     gameState.active = true
-
+    gameState.score = 0
     this.createParallaxBackgrounds();
 
     gameState.player = this.physics.add.sprite(100, 450, 'flan')
@@ -38,10 +38,10 @@ class sherlock extends Phaser.Scene {
 
     gameState.platforms = this.physics.add.staticGroup();
 
+    this.levelSetup();
     this.createAnimations(); 
     this.createPoints();
-    this.levelSetup();
-    
+    this.createApples();
 
     this.physics.add.collider(gameState.player, gameState.p_platform);
     this.physics.add.collider(gameState.player, gameState.platforms);
@@ -80,6 +80,32 @@ class sherlock extends Phaser.Scene {
     gameState.bg1.setScrollFactor((bg1_width - window_width) / (game_width - window_width));
     gameState.bg2.setScrollFactor((bg2_width - window_width) / (game_width - window_width));
   }  
+
+  levelSetup() {
+    for (const [xIndex, yIndex] of this.heights.entries()) {
+      this.createPlatform(xIndex, yIndex);
+    } 
+
+    gameState.goal = this.physics.add.sprite(gameState.width - 80, 100, 'door');
+
+    /*
+    this.physics.add.overlap(gameState.player, gameState.goal, function() {
+      this.cameras.main.fade(800, 0, 0, 0, false, function(camera, progress) {
+        if (progress > .9) {
+          this.scene.stop(this.levelKey);
+          this.scene.start(this.nextLevel[this.levelKey]);
+        }
+      });
+    */
+  }
+
+  createPlatform(xIndex, yIndex) {
+    // Creates a platform evenly spaced along the two indices.
+    // If either is not a number it won't make a platform
+      if (typeof yIndex === 'number' && typeof xIndex === 'number') {
+        gameState.platforms.create((220 * xIndex),  yIndex * 70, 'platform').setOrigin(0, 0.5).refreshBody();
+      }
+  }
 
   createAnimations() {
     //player's animation
@@ -234,35 +260,54 @@ class sherlock extends Phaser.Scene {
       repeat: -1,
       yoyo: true
     })
+
+    ///////// LO SIGUIENTE ES TEMPORAL //////////
+    gameState.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+    //////////////////////////////
+
+    this.physics.add.overlap(gameState.player, gameState.skull, this.addPoint, null, this);
+    this.physics.add.overlap(gameState.player, gameState.scarf, this.addPoint, null, this);
+    this.physics.add.overlap(gameState.player, gameState.smile, this.addPoint, null, this);
+    this.physics.add.overlap(gameState.player, gameState.mobile, this.addPoint, null, this);
+    this.physics.add.overlap(gameState.player, gameState.violin, this.addPoint, null, this);
   }
 
-  levelSetup() {
-    for (const [xIndex, yIndex] of this.heights.entries()) {
-      this.createPlatform(xIndex, yIndex);
-    } 
-
-    gameState.goal = this.physics.add.sprite(gameState.width - 80, 100, 'door');
-
-    /*
-    this.physics.add.overlap(gameState.player, gameState.goal, function() {
-      this.cameras.main.fade(800, 0, 0, 0, false, function(camera, progress) {
-        if (progress > .9) {
-          this.scene.stop(this.levelKey);
-          this.scene.start(this.nextLevel[this.levelKey]);
-        }
-      });
-    */
+  addPoint(player, point){
+    point.disableBody(true, true);
+    gameState.score +=1;
+    gameState.scoreText.setText('Score: ' + gameState.score);
   }
 
-  createPlatform(xIndex, yIndex) {
-    // Creates a platform evenly spaced along the two indices.
-    // If either is not a number it won't make a platform
-      if (typeof yIndex === 'number' && typeof xIndex === 'number') {
-        gameState.platforms.create((220 * xIndex),  yIndex * 70, 'platform').setOrigin(0, 0.5).refreshBody();
-      }
+  createApples(){
+    gameState.apples = this.physics.add.group();
+
+    gameState.timedEvent = this.time.addEvent({
+      delay: 2000, 
+      callback: this.createA, 
+      callbackScope: this, 
+      loop: true 
+    });
+
+    this.physics.add.collider(gameState.apples, gameState.p_platform);
+    this.physics.add.collider(gameState.apples, gameState.platforms);
+    this.physics.add.collider(gameState.player, gameState.apples, this.hitApple, null, this);
   }
 
+  createA(){
   
+    gameState.X = (gameState.player.x < 1000) ? Phaser.Math.Between(1000, 2000) : Phaser.Math.Between(0, 1000);
+
+    gameState.apple = gameState.apples.create(gameState.X, 16, 'apple');
+    gameState.apple.setScale(.6);
+    gameState.apple.setBounce(1);
+    gameState.apple.setCollideWorldBounds(true);
+    gameState.apple.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    gameState.apple.allowGravity = false;
+  }
+
+  hitApple(player, apple){
+    this.scene.restart(this.sherlock);
+  }
 
   update(){
     
