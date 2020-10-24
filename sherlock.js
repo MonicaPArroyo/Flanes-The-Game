@@ -282,7 +282,7 @@ class sherlock extends Phaser.Scene {
     gameState.apples = this.physics.add.group();
 
     gameState.timedEvent = this.time.addEvent({
-      delay: 2000, 
+      delay: 4000, 
       callback: this.createA, 
       callbackScope: this, 
       loop: true 
