@@ -27,7 +27,10 @@ class sherlock extends Phaser.Scene {
   create() {
     gameState.active = true
     gameState.score = 0
+    gameState.flag = false
     this.createParallaxBackgrounds();
+
+    gameState.goal = this.physics.add.sprite(gameState.width - 80, 100, 'door');
 
     gameState.player = this.physics.add.sprite(100, 450, 'flan')
     gameState.player.setBounce(0.2);
@@ -38,10 +41,10 @@ class sherlock extends Phaser.Scene {
 
     gameState.platforms = this.physics.add.staticGroup();
 
-    this.levelSetup();
     this.createAnimations(); 
     this.createPoints();
     this.createApples();
+    this.levelSetup();
 
     this.physics.add.collider(gameState.player, gameState.p_platform);
     this.physics.add.collider(gameState.player, gameState.platforms);
@@ -81,31 +84,7 @@ class sherlock extends Phaser.Scene {
     gameState.bg2.setScrollFactor((bg2_width - window_width) / (game_width - window_width));
   }  
 
-  levelSetup() {
-    for (const [xIndex, yIndex] of this.heights.entries()) {
-      this.createPlatform(xIndex, yIndex);
-    } 
-
-    gameState.goal = this.physics.add.sprite(gameState.width - 80, 100, 'door');
-
-    /*
-    this.physics.add.overlap(gameState.player, gameState.goal, function() {
-      this.cameras.main.fade(800, 0, 0, 0, false, function(camera, progress) {
-        if (progress > .9) {
-          this.scene.stop(this.levelKey);
-          this.scene.start(this.nextLevel[this.levelKey]);
-        }
-      });
-    */
-  }
-
-  createPlatform(xIndex, yIndex) {
-    // Creates a platform evenly spaced along the two indices.
-    // If either is not a number it won't make a platform
-      if (typeof yIndex === 'number' && typeof xIndex === 'number') {
-        gameState.platforms.create((220 * xIndex),  yIndex * 70, 'platform').setOrigin(0, 0.5).refreshBody();
-      }
-  }
+  
 
   createAnimations() {
     //player's animation
@@ -184,7 +163,7 @@ class sherlock extends Phaser.Scene {
   }
 
   createPoints(){
-    
+
     gameState.skull = this.physics.add.sprite(100, 200, 'skull');
     gameState.scarf = this.physics.add.sprite(600, 500, 'scarf');
     gameState.smile = this.physics.add.sprite(1050, 100, 'smile');
@@ -263,6 +242,7 @@ class sherlock extends Phaser.Scene {
 
     ///////// LO SIGUIENTE ES TEMPORAL //////////
     gameState.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+    gameState.scoreText.setScrollFactor(0);
     //////////////////////////////
 
     this.physics.add.overlap(gameState.player, gameState.skull, this.addPoint, null, this);
@@ -276,13 +256,18 @@ class sherlock extends Phaser.Scene {
     point.disableBody(true, true);
     gameState.score +=1;
     gameState.scoreText.setText('Score: ' + gameState.score);
+
+    if (gameState.score === 5 && gameState.flag === false){
+        gameState.goal.anims.play('door_opened', true);
+        gameState.flag = true;
+    }
   }
 
   createApples(){
     gameState.apples = this.physics.add.group();
 
     gameState.timedEvent = this.time.addEvent({
-      delay: 4000, 
+      delay: 10000, 
       callback: this.createA, 
       callbackScope: this, 
       loop: true 
@@ -306,7 +291,48 @@ class sherlock extends Phaser.Scene {
   }
 
   hitApple(player, apple){
-    this.scene.restart(this.sherlock);
+
+    gameState.player.setTint(0xff0000);
+
+    this.cameras.main.shake(400, .01, false, function(camera, progress) {
+      if (progress > .9) {
+        this.scene.restart('sherlock');
+      }
+    });
+  }
+
+  levelSetup() {
+    for (const [xIndex, yIndex] of this.heights.entries()) {
+      this.createPlatform(xIndex, yIndex);
+    } 
+
+    this.physics.add.overlap(gameState.player, gameState.goal, this.checkPoints, null, this);
+  }
+
+  createPlatform(xIndex, yIndex) {
+    // Creates a platform evenly spaced along the two indices.
+    // If either is not a number it won't make a platform
+      if (typeof yIndex === 'number' && typeof xIndex === 'number') {
+        gameState.platforms.create((220 * xIndex),  yIndex * 70, 'platform').setOrigin(0, 0.5).refreshBody();
+      }
+  }
+
+  checkPoints(player, goal)
+  {
+
+    
+    if (gameState.flag){
+      
+      this.cameras.main.fade(800, 0, 0, 0, false, function(cameras, progress){
+        if(progress > .9) {
+
+         
+          this.scene.stop('sherlock');
+          this.scene.start('doctorWho');
+        }
+      });
+     
+    }
   }
 
   update(){
@@ -331,18 +357,8 @@ class sherlock extends Phaser.Scene {
           gameState.player.anims.play('jump', true);
           gameState.player.setVelocityY(-500);
       }
-      /*
-
-      if (gameState.player.y > gameState.bg3.height) {
-        this.cameras.main.shake(240, .01, false, function(camera, progress) {
-          if (progress > .9) {
-            this.scene.restart(this.levelKey);
-          }
-        });
-      }
-    */
+    }
   }
-}
 
 
 }

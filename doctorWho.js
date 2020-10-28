@@ -4,20 +4,18 @@ class doctorWho extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet('codey_sled', 'https://s3.amazonaws.com/codecademy-content/courses/learn-phaser/Codey+Tundra/codey_sled.png', { frameWidth: 81, frameHeight: 90 });
+    this.load.spritesheet('hedgehog', 'assets/sprites/hedgehog.png', {frameWidth: 106, frameHeight: 101});
   }
 
   create() {
-    gameState.player = this.add.sprite(config.width / 2, config.height / 2, 'codey_sled');
+    gameState.player = this.add.sprite(config.width / 2, config.height / 2, 'hedgehog');
 
     this.anims.create({
       key: 'sled',
-      frames: this.anims.generateFrameNumbers('codey_sled'),
+      frames: this.anims.generateFrameNumbers('hedgehog'),
       frameRate: 10,
       repeat: -1
     })
-
-    gameState.player.angle = 20;
   }
 
   update() {
