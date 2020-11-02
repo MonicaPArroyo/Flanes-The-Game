@@ -1,7 +1,7 @@
 class sherlock extends Phaser.Scene {
   constructor(){
     super({key: 'sherlock'})
-    this.heights = [4, 7, 5, null, 5, 4, null, 4, 5];
+    this.heights = [4, 7, 5, null, 7, 5, null, 4, 5];
   }
 
   preload() {
@@ -28,6 +28,8 @@ class sherlock extends Phaser.Scene {
     gameState.active = true
     gameState.score = 0
     gameState.flag = false
+    gameState.health = 3;
+    gameState.maxHealth = 3;
     this.createParallaxBackgrounds();
 
     gameState.goal = this.physics.add.sprite(gameState.width - 80, 100, 'door');
@@ -35,6 +37,7 @@ class sherlock extends Phaser.Scene {
     gameState.player = this.physics.add.sprite(100, 450, 'flan')
     gameState.player.setBounce(0.2);
     gameState.player.setCollideWorldBounds(true);
+
 
     gameState.p_platform = this.physics.add.staticGroup();
     gameState.p_platform.create(1000, 587, 'p_platform')
@@ -267,7 +270,7 @@ class sherlock extends Phaser.Scene {
     gameState.apples = this.physics.add.group();
 
     gameState.timedEvent = this.time.addEvent({
-      delay: 10000, 
+      delay: 7000, 
       callback: this.createA, 
       callbackScope: this, 
       loop: true 
@@ -291,14 +294,27 @@ class sherlock extends Phaser.Scene {
   }
 
   hitApple(player, apple){
+    apple.disableBody(true,true);
+    gameState.health -= 1;
 
-    gameState.player.setTint(0xff0000);
+    if(gameState.health === 2)
+    {
+      gameState.player.setTint(0xffA0A0);
+    }
+    if(gameState.health === 1)
+    {
+      gameState.player.setTint(0xff7070);
+    }
+    if(gameState.health <= 0)
+    {
+      gameState.player.setTint(0xff0000);
 
-    this.cameras.main.shake(400, .01, false, function(camera, progress) {
-      if (progress > .9) {
-        this.scene.restart('sherlock');
-      }
-    });
+      this.cameras.main.shake(400, .01, false, function(camera, progress) {
+        if (progress > .9) {
+          this.scene.restart('sherlock');
+        }
+      });
+    }
   }
 
   levelSetup() {
